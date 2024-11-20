@@ -19,9 +19,21 @@ def create_livros(request):
         serializers.save()
         return Response(serializers.data, status=status.HTTP_201_CREATED)
     return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
-        
-        
-
  
-
-
+@api_view(['PUT', 'DELETE']) 
+def editar_livro(request, pk):
+    try:
+        livro = Livro.objects.get(pk=pk)
+    except Livro.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    
+    if request.method == 'DELETE':
+        livro.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    elif request.method == 'PUT':
+        data = request.data 
+        serializer = LivroSerializers(livro, data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
