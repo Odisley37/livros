@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import "./App.css";
-import { FaEdit, FaTrashAlt, FaPlus } from "react-icons/fa"; // Importando ícones do FontAwesome
+import { FaEdit, FaTrashAlt, FaPlus } from "react-icons/fa";
 
 function App() {
   const [livros, setLivros] = useState([]);
@@ -47,6 +47,11 @@ function App() {
   };
 
   const updateTitle = async (pk, currentDate) => {
+    if (novoTitulo.trim() === "") {
+      alert("O título não pode ser vazio!");
+      return; // Não envia a requisição se o título estiver vazio
+    }
+
     const livroData = {
       livro: novoTitulo,
       date: currentDate,
@@ -71,6 +76,7 @@ function App() {
           }
         })
       );
+      setNovoTitulo(""); // Limpar campo após atualização
     } catch (err) {
       console.log(err);
     }
@@ -114,20 +120,26 @@ function App() {
       <div className="card-container">
         {livros.map((item) => (
           <div key={item.id} className="card">
-            <h2 className="card-title">{item.livro}</h2>
-            <p className="card-date">Ano de lançamento: {item.date}</p>
+            <div className="card-title">{item.livro}</div>
+            <div className="card-date">{item.date}</div>
+
+            {/* Campo de Novo Título */}
             <input
-              className="fieldBox"
               type="text"
-              placeholder="Novo título..."
+              value={novoTitulo === "" ? "" : novoTitulo}
               onChange={(e) => setNovoTitulo(e.target.value)}
+              className="fieldBox"
+              placeholder="Novo título"
             />
-            <button onClick={() => updateTitle(item.id, item.date)}>
-              <FaEdit /> Editar livro
-            </button>
-            <button onClick={() => deleteLivro(item.id)}>
-              <FaTrashAlt /> Deletar Livro
-            </button>
+
+            <div className="card-buttons">
+              <button className="edit" onClick={() => updateTitle(item.id, item.date)}>
+                <FaEdit /> Editar
+              </button>
+              <button className="delete" onClick={() => deleteLivro(item.id)}>
+                <FaTrashAlt /> Deletar
+              </button>
+            </div>
           </div>
         ))}
       </div>
